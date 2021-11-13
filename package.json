@@ -1,0 +1,11 @@
+{
+    "name": "server",
+    "version": "1.0.0",
+    "description": "Testing create server",
+    "dependencies": {
+        "express": "^4.17.1",
+        "nodemon": "^2.0.15",
+        "shortid": "^2.2.16",
+        "socket.io": "^2.1.1"
+    }
+}
