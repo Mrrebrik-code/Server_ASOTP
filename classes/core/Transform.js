@@ -5,7 +5,4 @@ module.exports = class Transform {
     constructor() {
         this.position = new Position();
     }
-    static newPosition(vector3) {
-        this.position.newVector3(vector3);
-    }
 }
