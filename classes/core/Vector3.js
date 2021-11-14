@@ -4,6 +4,11 @@ module.exports = class Vector3 {
         this.y;
         this.z;
     }
+    static newVector3(vector3) {
+        this.x = vector3.x;
+        this.y = vector3.y;
+        this.z = vector3.z;
+    }
 
     magnitude() {
         return Math.sqrt((this.x * this.x) + (this.y * this.y) + (this.z * this.z));

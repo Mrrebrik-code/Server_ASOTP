@@ -1,10 +1,12 @@
 const shortId = require("shortid");
-const Vector3 = require("./core/Vector3");
+const Transform = require("./core/Transform.js");
 
 module.exports = class Player {
     constructor() {
         this.nickName = "default_player";
         this.id = shortId.generate();
-        this.position = new Vector3();
+        this.transform = new Transform();
     }
+
+
 }
