@@ -11,7 +11,7 @@ module.exports = class Vector3 {
 
     normalized() {
         var magnitudeVector3 = this.magnitude();
-        return new Vector3(this.x / magnitudeVector3, this.y / magnitudeVector3, this.z * magnitudeVector3);
+        return new Vector3(this.x / magnitudeVector3, this.y / magnitudeVector3, this.z / magnitudeVector3);
     }
 
     distance(OtherVector = Vector3) {
