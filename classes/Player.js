@@ -7,6 +7,4 @@ module.exports = class Player {
         this.id = shortId.generate();
         this.transform = new Transform();
     }
-
-
 }
