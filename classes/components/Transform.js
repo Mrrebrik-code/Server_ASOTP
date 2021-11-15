@@ -1,5 +1,4 @@
 const Vector3 = require("./Vector3");
-const Vector3 = require("./Vector3");
 
 module.exports = class Transform {
     constructor() {

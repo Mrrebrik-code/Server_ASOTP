@@ -1,7 +1,7 @@
-module.exports = new class Room {
-    constructor(nameRoom, idRoom) {
-        this.id = idRoom;
-        this.name = nameRoom;
+module.exports = class Room {
+    constructor() {
+        this.id = "0";
+        this.name = "default";
         this.players = [];
     }
 }

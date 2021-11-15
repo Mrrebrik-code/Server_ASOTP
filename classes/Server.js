@@ -1,9 +1,65 @@
-const IO = require("socket.io")(process.env.PORT || 4567);
-const Logger = require("./classes/debug/logger.js");
-const Player = require("./classes/Player.js");
-const Room = require("./classes/rooms/Room.js");
+const Connection = require('./Connection');
+const Player = require('./Player');
+const Logger = require('./Debug/logger');
 
-Logger.log("Start server to open port: 4567")
+module.exports = class Server {
+    constructor() {
+        this.connections = [];
+        this.lobbys = [];
+    }
+
+    update() {}
+
+    connected(socket) {
+        let server = this;
+        let connection = new Connection();
+        connection.socket = socket;
+        connection.player = new Player();
+        connection.server = server;
+
+        let player = connection.player;
+        let lobbys = server.lobbys;
+
+        Logger.log(`Added new player to the server: ${player.displayPalyerInformation()}`);
+        server.connections[player.id] = connection;
+
+        socket.join(player.lobby);
+        connection.lobby = lobbys[player.lobby];
+        connection.lobby.enter(connection);
+
+        return connection;
+    }
+
+    disconnected(connection = Connection) {}
+
+    attemptToJoinGame(connection = Connection) {}
+
+    switchLobby(connection = Connection, lobbyID) {}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var rooms = [];
 
@@ -53,15 +109,24 @@ IO.on('connection', function(socket) {
         socket.broadcast.emit('updateScale', player);
     });
 
-    socket.on('create-room', function(callback) {
-        var nameRoom = callback.NameRoom;
-        var room = new Room(nameRoom, callback.Id);
-        rooms[nameRoom] = room;
-    });
+    // socket.on('create-room', function(callback) {
+    //     var nameRoom = callback.NameRoom;
+    //     var room = new Room();
+    //     room.id = callback.id;
+    //     room.name = nameRoom;
+    //     rooms[nameRoom] = room;
+    //     Logger.log("create room: " + nameRoom);
+    //     socket.emit("create room", rooms);
+    // });
 
-    socket.on('join-room', function(callback) {
-        var room = rooms[callback.NameRoom];
-    });
+    // socket.on('join-room', function(callback) {
+    //     var room = rooms[callback.NameRoom];
+    // });
+
+    // socket.on('show-rooms', function(callback) {
+    //     socket.emit('show-rooms', rooms);
+
+    // });
 
     socket.on('disconnect', () => {
         Logger.log("Player disconected server");
