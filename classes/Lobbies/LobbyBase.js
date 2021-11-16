@@ -15,7 +15,7 @@ module.exports = class LobbyBase {
         let lobby = this;
         let player = connection.player;
 
-        Logger.log(`Player: ${player.displayPlayerInformation()}, has entered the lobby [${lobby.id}]`);
+        Logger.log(`Player: ${player.displayPalyerInformation()}, has entered the lobby [${lobby.id}]`);
 
         lobby.connections.push(connection);
 
@@ -27,7 +27,7 @@ module.exports = class LobbyBase {
         let lobby = this;
         let player = connection.player;
 
-        Logger.log(`Player: ${player.displayPlayerInformation()}, has left the lobby [${lobby.id}]`);
+        Logger.log(`Player: ${player.displayPalyerInformation()}, has left the lobby [${lobby.id}]`);
 
         connection.lobby = undefined;
 
