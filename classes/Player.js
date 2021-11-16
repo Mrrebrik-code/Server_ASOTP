@@ -11,6 +11,6 @@ module.exports = class Player {
 
     displayPalyerInformation() {
         let player = this;
-        return `(${player.nickName} : ${palyer.id})`;
+        return `(${player.nickName} : ${player.id})`;
     }
 }

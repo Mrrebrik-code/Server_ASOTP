@@ -9,8 +9,8 @@ module.exports = class LobbyGame extends LobbyBase {
     }
 
     update() {
-        let lobby = this;
-        lobby.deadPlayers();
+        //let lobby = this;
+        //lobby.deadPlayers();
     }
 
     canEnter(connection = Connection) {
@@ -40,10 +40,31 @@ module.exports = class LobbyGame extends LobbyBase {
     }
 
     addPlayer(connection = Connection) {
+        let lobby = this;
+        let connections = lobby.connections;
+        let socket = connection.socket;
 
+        var returnData = {
+            id: connection.player.id
+        }
+
+        socket.emit('spawn', returnData);
+        socket.broadcast.to(lobby.id).emit('spawn', returnData);
+
+        connections.forEach(c => {
+            if (c.player.id != connection.player.id) {
+                socket.emit('spawn', {
+                    id: c.player.id
+                });
+            }
+        });
     }
 
     removePlayer(connection = Connection) {
+        let lobby = this;
 
+        connection.socket.broadcast.to(lobby.id).emit('disconnect', {
+            id: connection.player.id
+        });
     }
 }
