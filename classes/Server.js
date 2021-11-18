@@ -64,6 +64,20 @@ module.exports = class Server {
         connection.lobby.enter(connection);
     }
 
+    createRoom(data, connection = Connection) {
+        let server = this;
+        let socket = connection.socket;
+        let lobbys = server.lobbys;
+
+        socket.join(data.name);
+        lobbys[data.name] = new LobbyGame(lobbys.length + 1);
+
+        connection.lobby = lobbys[data.name];
+        connection.lobby.enter(connection);
+
+        socket.broadcast.emit('create-room', { "name": data.name, "counPlayers": connection.lobby.connections.length });
+    }
+
     attemptToJoinGame(connection = Connection) {
         let server = this;
         let lobbyFound = false;
