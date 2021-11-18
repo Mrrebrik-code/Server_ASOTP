@@ -24,12 +24,18 @@ module.exports = class Connection {
         socket.on('join-lobby', (data) => {
             server.joinLobby(data.name, connection);
         })
+        socket.on('join-room', (data) => {
+            //join-room
+        });
+        socket.on('create-room', (data) => {
+            server.createRoom(data, connection);
+        });
         socket.on('update-position', (callback) => {
             player.transform.position.X = callback.Position.X;
             player.transform.position.Y = callback.Position.Y;
             player.transform.position.Z = callback.Position.Z;
             Logger.log(`${player.id} :` + player.transform.position.ToString());
-            socket.broadcast.to("test").emit('updatePosition', player);
+            socket.broadcast.to("test").emit('update-position', player);
         });
         socket.on('update-rotation', (callback) => {
             player.transform.rotation.X = callback.Rotation.X;
