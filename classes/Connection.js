@@ -21,9 +21,7 @@ module.exports = class Connection {
         socket.on('join-game', () => {
             server.attemptToJoinGame(connection);
         });
-        socket.on('join-lobby', (data) => {
-            server.joinLobby(data.name, connection);
-        })
+
         socket.on('join-room', (data) => {
             //join-room
         });

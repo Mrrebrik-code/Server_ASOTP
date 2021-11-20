@@ -1,11 +1,11 @@
-const LobbyBase = require('./LobbyBase');
-const LobbyGameSettings = require('./LobbyGameSettings');
+const RoomSettings = require('./RoomSettings');
 const Connection = require('../Connection');
+const RoomBase = require('./RoomBase');
 
-module.exports = class LobbyGame extends LobbyBase {
-    constructor(id, settings = LobbyGameSettings) {
-        super(id);
-        this.settings = settings;
+module.exports = class RoomGame extends RoomBase {
+    constructor(settingsRoom = RoomSettings) {
+        super(settingsRoom.Name);
+        this.settings = settingsRoom;
     }
 
     update() {

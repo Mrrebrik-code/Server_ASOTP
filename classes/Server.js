@@ -3,26 +3,26 @@ const Player = require('./Player');
 const Logger = require('./Debug/logger');
 
 
-const LobbyBase = require("./Lobbies/LobbyBase");
-const LobbyGame = require("./Lobbies/LobbyGame");
-const LobbyGameSettings = require("./Lobbies/LobbyGameSettings");
+const RoomGame = require("./Rooms/RoomGame");
+const RoomSettings = require('./Rooms/RoomSettings');
+const e = require('express');
 
 module.exports = class Server {
     constructor() {
         this.connections = [];
         this.lobbys = [];
-
-        this.lobbys["test"] = new LobbyGame(15);
     }
 
+    //Updater lobbys server
     update() {
         let server = this;
 
-        for (let id in server.lobbys) {
-            server.lobbys[id].update();
+        for (let lobby in server.lobbys) {
+            server.lobbys[lobby].update();
         }
     }
 
+    //Connection player to server. Server connections add player from player.id
     connected(socket) {
         let server = this;
         let connection = new Connection();
@@ -39,6 +39,7 @@ module.exports = class Server {
         return connection;
     }
 
+    //Disconnected player server and message more users clinet info disconnected player.id
     disconnected(connection = Connection) {
         let server = this;
         let id = connection.player.id;
@@ -47,75 +48,73 @@ module.exports = class Server {
 
         Logger.log(`Player disconnected server ID: ${id}`);
 
+        Logger.log("ASDasDADS:" + connection.player.nickName);
+        server.lobbys.forEach(c => {
+            Logger.log('Lobby: ' + c.name);
+        });
+
+        let lobby = server.lobbys[connection.lobby];
+        Logger.log(lobby.settings.Name);
+        lobby.leave(connection);
         connection.socket.broadcast.to(connection.player.lobby).emit('disconnected', {
             id: id
         });
-
-        server.lobbys[connection.player.lobby].leave(connection);
-    }
-
-    joinLobby(nameLobby, connection = Connection) {
-        let server = this;
-        let socket = connection.socket;
-        let lobbys = server.lobbys;
-
-        socket.join(nameLobby);
-        connection.lobby = lobbys[nameLobby];
-        connection.lobby.enter(connection);
     }
 
     createRoom(data, connection = Connection) {
         let server = this;
         let socket = connection.socket;
-        let lobbys = server.lobbys;
 
         socket.join(data.name);
-        lobbys[data.name] = new LobbyGame(lobbys.length + 1);
+        Logger.log(data.roomName);
 
-        connection.lobby = lobbys[data.name];
+        let settingsRoom = new RoomSettings(data.roomName, data.gameMode, data.maxPlayer);
+        server.lobbys[data.name] = new RoomGame(settingsRoom);
+
+        connection.lobby = server.lobbys[data.name];
+        Logger.log("TSETSERSE: " + connection.lobby.name);
         connection.lobby.enter(connection);
 
-        socket.broadcast.emit('create-room', { "name": data.name, "counPlayers": connection.lobby.connections.length });
+        socket.broadcast.emit('create-room', {
+            "name": data.name,
+            "id": data.id,
+            "gameMode": data.gameMode,
+            "maxPlayer": data.maxPlayer,
+            "countPlayers": connection.lobby.connections.length
+        });
     }
 
-    attemptToJoinGame(connection = Connection) {
+    joinRoom(data, connection = Connection) {
         let server = this;
-        let lobbyFound = false;
+        let lobby = server.lobbys[data.name];
+        let status = false;
 
-        let gameLobbies = server.lobbys.filter(item => {
-            return item instanceof LobbyGame;
-        });
+        if (lobby) {
+            let canJoin = lobby.canEnter(connection);
 
-        gameLobbies.forEach(lobby => {
-            if (!lobbyFound) {
-                let canJoin = lobby.canEnter(connection);
-
-                if (canJoin) {
-                    lobbyFound = true;
-                    server.switchLobby(connection, lobby.id);
-                }
+            if (canJoin) {
+                Logger.log('Connected player: ' + connection.player.nickName + " to room: " + lobby.name);
+                server.switchRoom(connection, lobby.name);
+                status = true;
             }
-        });
-
-        if (!lobbyFound) {
-            Logger.log('Making a new game lobby');
-            let gameLobby = new gameLobby(gameLobbies.length + 1, new LobbyGameSettings("FFA", 2));
-            server.lobbys.push(gameLobby);
-            server.switchLobby(connection, gameLobby.id);
+        } else {
+            status = false;
         }
 
-
+        connection.socket.emit('connected-room', {
+            "status": status
+        });
     }
 
-    switchLobby(connection = Connection, lobbyID) {
+    switchRoom(connection = Connection, lobbyName) {
         let server = this;
         let lobbys = server.lobbys;
 
-        connection.socket.join(lobbyID);
-        connection.lobby = lobbys[lobbyID];
+        connection.socket.join(lobbyName);
+        connection.lobby = lobbys[lobbyName];
 
         lobbys[connection.player.lobby].leave(connection);
-        lobbys[lobbyID].enter(connection);
+        lobbys[lobbyName].enter(connection);
     }
 }
 

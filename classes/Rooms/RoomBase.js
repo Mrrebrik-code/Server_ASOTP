@@ -1,9 +1,9 @@
 const Connection = require("../Connection");
 const Logger = require('../Debug/logger');
 
-module.exports = class LobbyBase {
-    constructor(id) {
-        this.id = id;
+module.exports = class RoomBase {
+    constructor(nameRoom) {
+        this.name = nameRoom;
         this.connections = [];
     }
 
@@ -15,11 +15,11 @@ module.exports = class LobbyBase {
         let lobby = this;
         let player = connection.player;
 
-        Logger.log(`Player: ${player.displayPalyerInformation()}, has entered the lobby [${lobby.id}]`);
+        Logger.log(`Player: ${player.displayPalyerInformation()}, has entered the lobby [${lobby.name}]`);
 
         lobby.connections.push(connection);
 
-        player.lobby = lobby.id;
+        player.lobby = lobby.name;
         connection.lobby = lobby;
     }
 
@@ -27,7 +27,7 @@ module.exports = class LobbyBase {
         let lobby = this;
         let player = connection.player;
 
-        Logger.log(`Player: ${player.displayPalyerInformation()}, has left the lobby [${lobby.id}]`);
+        Logger.log(`Player: ${player.displayPalyerInformation()}, has left the lobby [${lobby.name}]`);
 
         connection.lobby = undefined;
 
