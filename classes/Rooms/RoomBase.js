@@ -19,7 +19,7 @@ module.exports = class RoomBase {
 
         lobby.connections.push(connection);
 
-        player.lobby = lobby.name;
+        player.room = lobby.name;
         connection.lobby = lobby;
     }
 

@@ -5,12 +5,14 @@ const Logger = require('./Debug/logger');
 
 const RoomGame = require("./Rooms/RoomGame");
 const RoomSettings = require('./Rooms/RoomSettings');
-const e = require('express');
 
 module.exports = class Server {
     constructor() {
         this.connections = [];
         this.lobbys = [];
+
+
+        this.lobbys["test123"] = new RoomGame(new RoomSettings("test123", "test123", "2"))
     }
 
     //Updater lobbys server
@@ -48,53 +50,52 @@ module.exports = class Server {
 
         Logger.log(`Player disconnected server ID: ${id}`);
 
-        Logger.log("ASDasDADS:" + connection.player.nickName);
-        server.lobbys.forEach(c => {
-            Logger.log('Lobby: ' + c.name);
-        });
-
         let lobby = server.lobbys[connection.lobby];
-        Logger.log(lobby.settings.Name);
-        lobby.leave(connection);
-        connection.socket.broadcast.to(connection.player.lobby).emit('disconnected', {
-            id: id
-        });
+        if (lobby != null) {
+            Logger.log(lobby.settings.Name);
+            lobby.leave(connection);
+            connection.socket.broadcast.to(connection.player.room).emit('disconnected', {
+                id: id
+            });
+        }
+
     }
 
     createRoom(data, connection = Connection) {
         let server = this;
         let socket = connection.socket;
 
-        socket.join(data.name);
-        Logger.log(data.roomName);
+        socket.join(data.RoomName);
+        Logger.log(data.RoomName);
 
-        let settingsRoom = new RoomSettings(data.roomName, data.gameMode, data.maxPlayer);
-        server.lobbys[data.name] = new RoomGame(settingsRoom);
+        let settingsRoom = new RoomSettings(data.RoomName, data.GameMode, data.MaxPlayer);
+        server.lobbys[data.RoomName] = new RoomGame(settingsRoom);
 
-        connection.lobby = server.lobbys[data.name];
-        Logger.log("TSETSERSE: " + connection.lobby.name);
+        connection.lobby = server.lobbys[data.RoomName];
         connection.lobby.enter(connection);
 
         socket.broadcast.emit('create-room', {
-            "name": data.name,
-            "id": data.id,
-            "gameMode": data.gameMode,
-            "maxPlayer": data.maxPlayer,
-            "countPlayers": connection.lobby.connections.length
+            name: data.RoomName,
+            id: data.RoomID,
+            gameMode: data.GameMode,
+            maxPlayer: data.MaxPlayer,
+            countPlayers: connection.lobby.connections.length
         });
     }
 
     joinRoom(data, connection = Connection) {
         let server = this;
-        let lobby = server.lobbys[data.name];
+        let lobby = server.lobbys[data];
         let status = false;
+
 
         if (lobby) {
             let canJoin = lobby.canEnter(connection);
-
             if (canJoin) {
                 Logger.log('Connected player: ' + connection.player.nickName + " to room: " + lobby.name);
-                server.switchRoom(connection, lobby.name);
+                connection.socket.join(lobby.name);
+                connection.lobby = lobby;
+                lobby.enter(connection);
                 status = true;
             }
         } else {
@@ -102,8 +103,16 @@ module.exports = class Server {
         }
 
         connection.socket.emit('connected-room', {
-            "status": status
+            status: status
         });
+    }
+
+    leaveRoom(connection = Connection) {
+        let server = this;
+        let lobbys = server.lobbys;
+
+        lobbys[connection.player.room].leave(connection);
+
     }
 
     switchRoom(connection = Connection, lobbyName) {
@@ -113,7 +122,7 @@ module.exports = class Server {
         connection.socket.join(lobbyName);
         connection.lobby = lobbys[lobbyName];
 
-        lobbys[connection.player.lobby].leave(connection);
+        lobbys[connection.player.room].leave(connection);
         lobbys[lobbyName].enter(connection);
     }
 }

@@ -6,7 +6,7 @@ module.exports = class Player {
         this.nickName = "default_player";
         this.id = shortId.generate();
         this.transform = new Transform();
-        this.lobby = null;
+        this.room = null;
     }
 
     displayPalyerInformation() {

@@ -22,11 +22,15 @@ module.exports = class Connection {
             server.attemptToJoinGame(connection);
         });
 
-        socket.on('join-room', (data) => {
-            //join-room
-        });
+
         socket.on('create-room', (data) => {
             server.createRoom(data, connection);
+        });
+        socket.on('join-room', (data) => {
+            server.joinRoom(data, connection);
+        });
+        socket.on('leave-room', () => {
+            server.leaveRoom(connection);
         });
         socket.on('update-position', (callback) => {
             player.transform.position.X = callback.Position.X;

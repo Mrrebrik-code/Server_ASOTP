@@ -6,6 +6,7 @@ module.exports = class RoomGame extends RoomBase {
     constructor(settingsRoom = RoomSettings) {
         super(settingsRoom.Name);
         this.settings = settingsRoom;
+        console.log('Create test loby game room!');
     }
 
     update() {
@@ -63,7 +64,7 @@ module.exports = class RoomGame extends RoomBase {
     removePlayer(connection = Connection) {
         let lobby = this;
 
-        connection.socket.broadcast.to(lobby.id).emit('disconnect', {
+        connection.socket.broadcast.to(lobby.name).emit('leave-room', {
             id: connection.player.id
         });
     }
