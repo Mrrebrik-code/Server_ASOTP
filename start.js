@@ -13,5 +13,5 @@ setInterval(() => {
 io.on('connection', function(socket) {
     var connection = server.connected(socket);
     connection.createEvents();
-    connection.socket.emit('register', { 'id': connection.player.id });
+    connection.socket.emit('register', connection);
 });
