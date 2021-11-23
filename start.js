@@ -13,5 +13,8 @@ setInterval(() => {
 io.on('connection', function(socket) {
     var connection = server.connected(socket);
     connection.createEvents();
-    connection.socket.emit('register', connection);
+    connection.socket.emit('register', {
+        id: connection.player.id,
+        nickName: connection.player.nickName
+    });
 });

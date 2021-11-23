@@ -5,6 +5,7 @@ const Logger = require('./Debug/logger');
 
 const RoomGame = require("./Rooms/RoomGame");
 const RoomSettings = require('./Rooms/RoomSettings');
+const Messager = require('./Messager');
 
 module.exports = class Server {
     constructor() {
@@ -12,7 +13,8 @@ module.exports = class Server {
         this.lobbys = [];
 
 
-        this.lobbys["test123"] = new RoomGame(new RoomSettings("test123", "test123", "2"))
+        this.lobbys["menu"] = new RoomGame(new RoomSettings("menu", "menu_game", "2"))
+        this.messager = new Messager(this.lobbys["menu"]);
     }
 
     //Updater lobbys server
@@ -124,6 +126,13 @@ module.exports = class Server {
 
         lobbys[connection.player.room].leave(connection);
         lobbys[lobbyName].enter(connection);
+    }
+    onMessager(message, connection = Connection) {
+        let server = this;
+        let messager = server.messager;
+
+        messager.sendMessage(message, connection);
+        console.log(message);
     }
 }
 

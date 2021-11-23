@@ -32,6 +32,9 @@ module.exports = class Connection {
         socket.on('leave-room', () => {
             server.leaveRoom(connection);
         });
+        socket.on('messager', (data) => {
+            server.onMessager(data, connection);
+        });
         socket.on('update-position', (callback) => {
             player.transform.position.X = callback.Position.X;
             player.transform.position.Y = callback.Position.Y;
